@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Text to QR Code Generator</title>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+        body {
+            padding: 0;
+            margin: 0;
+            background: whitesmoke;
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            transition: 0.5s;
+        }
+        div.canvas-max-w {
+            max-width: 500px;
+            height: 100%;
+            border-radius: 7px;
+            margin-top: 100px;
+            background: white;
+            padding: 20px 0;
+            display: inline-block;
+            box-shadow: 0 4px 10px -5px rgba(0, 0, 0, 0.4);
+        }
+        .container {
+            padding: 0 5%;
+            margin: 0;
+        }
+        .txt-input {
+            resize: none;
+            width: 98%;
+            height: 59px;
+            font-family: 'Poppins', sans-serif;
+        }
+        .btn-start {
+            background: rgb(0, 140, 255);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            padding: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .btn-download {
+            background: rgb(26, 29, 32);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            padding: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 40vh;
+        }
+
+        .circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border-top: 3px solid #3498db;
+            border-right: 3px solid transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+            transform: rotate(360deg);
+            }
+        }
+        @keyframes animalert {
+            from {
+                right: -100px;
+                opacity: 0;
+            }
+            to {
+                right: 10px;
+                opacity: 1;
+            }
+        }
+        .popup-alert-w {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            max-width: 400px;
+            width: 100%;
+            height: auto;
+            background: rgb(244, 48, 48);
+            padding: 10px 0;
+            color: white;
+            animation-name: animalert;
+            animation-iteration-count:initial;
+            animation-delay: 0s;
+            animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+            animation-duration: 1s;
+        }
+    </style>
+  </head>
+  <body>
+    <div id="alertgagal">
+        <div class="popup-alert-w">
+            <div class="container">
+                <span>X</span>
+                &nbsp;
+                <span>Maaf Tidak bisa di Generate!..</span>
+            </div>
+        </div>
+    </div>
+    <div class="canvas-max-w">
+        <div class="container">
+            <label for="text">Enter text to generate into qrcode</label><br>
+            <textarea class="txt-input" id="text" rows="5" cols="50" placeholder="Typing this text!.."></textarea><br><br>
+            <button class="btn-start" onclick="generateQR()">Generate QR Code</button><br><br>
+            <center>
+                <div id="loading" class="loading">
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <div class="circle"></div>
+                </div>
+                <div id="qrcode"></div><br>
+            </center>
+            <div id="download"></div>
+        </div>
+    </div>
+<br>
+<br>
+<br>
+<br>
+    <script>
+      let qrCode;
+      let qrCodes = [];
+      let download_show = document.getElementById("download");
+      let loading = document.getElementById("loading");
+      let alertgagal= document.getElementById("alertgagal");
+      alertgagal.style.display = "none"
+      loading.style.display = "none";
+      download_show.innerHTML = "";
+      function generateQR() {
+        if (document.getElementById("text").value === "") {
+            // alert("tidak ada file nya")
+            download_show.innerHTML = "";
+            alertgagal.style.display = "block"
+            setTimeout(()=>{
+                alertgagal.style.display = "none"
+            }, 3000);
+            const qrCodeDiv = document.getElementById("qrcode");
+            for (let i = 0; i < qrCodes.length; i++) {
+                qrCodes[i]._el.innerHTML = "";
+            }
+        } else {
+            loading.style.display = "block";
+            const qrCodeDiv = document.getElementById("qrcode");
+            for (let i = 0; i < qrCodes.length; i++) {
+                qrCodes[i]._el.innerHTML = "";
+            }
+            qrCodes = [];
+            const myTimeout = setTimeout(pushout, 1000);
+            function pushout() {
+                loading.style.display = "none";
+                qrCode = new QRCode(qrCodeDiv, {
+                text: document.getElementById("text").value,
+                    width: 256,
+                    height: 256,
+                });
+                qrCodes.push(qrCode);
+                download_show.innerHTML = `
+                <button class="btn-download" onclick="downloadQR()">Download QR Code</button>
+                `;
+            }
+        }
+      }
+
+      function downloadQR() {
+        const qrCodeDataURL = qrCode._el.firstChild.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.download = "qrcode.png";
+        link.href = qrCodeDataURL;
+        link.click();
+      }
+    </script>
+  </body>
+</html>
